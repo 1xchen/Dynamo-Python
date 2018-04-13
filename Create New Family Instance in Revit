@@ -20,14 +20,14 @@ doc = DocumentManager.Instance.CurrentDBDocument
 
 TransactionManager.Instance.EnsureInTransaction(doc)
 
-if family.IsActive == False:
-	family.Activate()
-	doc.Regenerate()
+	if family.IsActive == False:
+		family.Activate()
+		doc.Regenerate()
 
-for i in range(0,15,3):
+	for i in range(0,15,3):
 	
-	fam = doc.Create.NewFamilyInstance(XYZ(i,0,i),family,Structure.StructuralType.NonStructural)
-	output.append(fam)
+		fam = doc.Create.NewFamilyInstance(XYZ(i,0,i),family,Structure.StructuralType.NonStructural)
+		output.append(fam)
 	
 TransactionManager.Instance.TransactionTaskDone()
 
