@@ -1,0 +1,34 @@
+import clr
+clr.AddReference('ProtoGeometry')
+from Autodesk.DesignScript.Geometry import *
+
+clr.AddReference('RevitAPI')
+from Autodesk.Revit.DB import *
+
+clr.AddReference('RevitServices')
+from RevitServices.Persistence import DocumentManager
+from RevitServices.Transactions import TransactionManager
+#The inputs to this node will be stored as a list in the IN variables.
+
+
+family = UnwrapElement(IN[0])
+output = []
+
+doc = DocumentManager.Instance.CurrentDBDocument
+#Assign your output to the OUT variable.
+
+
+TransactionManager.Instance.EnsureInTransaction(doc)
+
+if family.IsActive == False:
+	family.Activate()
+	doc.Regenerate()
+
+for i in range(0,15,3):
+	
+	fam = doc.Create.NewFamilyInstance(XYZ(i,0,i),family,Structure.StructuralType.NonStructural)
+	output.append(fam)
+	
+TransactionManager.Instance.TransactionTaskDone()
+
+OUT = output
