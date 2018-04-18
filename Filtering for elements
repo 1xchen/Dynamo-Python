@@ -1,0 +1,34 @@
+import clr
+clr.AddReference('ProtoGeometry')
+from Autodesk.DesignScript.Geometry import *
+
+#Import Revit Nodes
+clr.AddReference('RevitNodes')
+import Revit
+clr.ImportExtensions(Revit.Elements)
+
+#Import RevitAPI
+clr.AddReference('RevitAPI')
+import Autodesk
+from Autodesk.Revit.DB import *
+
+#Import DocumentManager and TransactionManager
+clr.AddReference('RevitServices')
+from RevitServices.Persistence import DocumentManager
+
+family = UnwrapElement(IN[0])
+doc = DocumentManager.Instance.CurrentDBDocument
+
+#Filtered Element Collector
+collector = FilteredElementCollector(doc, doc.ActiveView.Id)
+
+#Quick filter
+filter = ElementCategoryFilter(BuiltInCategory.OST_Doors)
+doors = collector.WherePasses(filter).ToElements()
+
+#Slow filter
+instanceFilter = FamilyInstanceFilter(doc, family.Id)
+doorInstance = collector.OfCategory(BuiltInCategory.OST_Doors).WherePasses(instanceFilter).ToElementIds()
+
+#Assign your output to the OUT variable.
+OUT = doorInstance
