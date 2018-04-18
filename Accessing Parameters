@@ -1,0 +1,55 @@
+import clr
+
+#Import Revit Nodes
+clr.AddReference("RevitNodes")
+import Revit
+clr.ImportExtensions(Revit.Elements)
+
+# Import RevitAPI
+clr.AddReference("RevitAPI")
+import Autodesk
+from Autodesk.Revit.DB import *
+
+# Import DocumentManager and TransactionManager
+clr.AddReference("RevitServices")
+from RevitServices.Persistence import DocumentManager
+from RevitServices.Transactions import TransactionManager
+
+#The inputs to this node will be stored as a list in the IN variables.
+doorCat = UnwrapElement(IN[0])
+output = []
+
+#Get the project document.
+doc = DocumentManager.Instance.CurrentDBDocument
+
+#Filter for doors.
+collector = FilteredElementCollector(doc, doc.ActiveView.Id)
+doors = collector.OfCategoryId(doorCat.Id).FirstElement()
+
+#Get all parameters
+parameters = doors.GetOrderedParameters()
+
+#Loop through parameters to check details.
+for parameter in parameters:
+	output.append(parameter.Definition.BuiltInParameter)
+
+#Get specific parameter with BuiltinParameter.
+doorMat = doors.get_Parameter(BuiltInParameter.DOOR_FRAME_MATERIAL)
+
+#Check Storage Type
+paramStorageType = doorMat.StorageType
+
+#View Value
+paramValue = doorMat.AsString()
+
+#Set Value
+TransactionManager.Instance.EnsureInTransaction(doc)
+
+doorMat.Set("Wood")
+
+TransactionManager.Instance.TransactionTaskDone()	
+
+paramValue = doorMat.AsString()
+
+#Assign your output to the OUT variable.
+OUT = paramValue
